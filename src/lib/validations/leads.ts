@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { leadStatuses } from "@/types/leads";
+import { leadPriorities, leadStatuses } from "@/types/leads";
 
 const emptyStringToUndefined = (value: unknown) => {
   if (typeof value === "string" && value.trim() === "") {
@@ -80,7 +80,29 @@ export const leadCreateSchema = z
   }));
 
 export const leadStatusUpdateSchema = z.object({
-  status: z.enum(leadStatuses),
+  status: z.enum(leadStatuses).optional(),
+  priority: z.enum(leadPriorities).optional(),
+  admin_notes: z.preprocess(
+    emptyStringToUndefined,
+    z.string().trim().max(4000, "Admin notes must be 4,000 characters or less.").nullable().optional(),
+  ),
+  follow_up_date: z.preprocess(
+    emptyStringToUndefined,
+    z.iso.date("Please enter a valid follow-up date.").nullable().optional(),
+  ),
+  estimated_value: z.preprocess((value) => {
+    if (value === "" || value === null || typeof value === "undefined") {
+      return null;
+    }
+
+    if (typeof value === "string") {
+      return Number(value);
+    }
+
+    return value;
+  }, z.number().min(0, "Estimated value must be 0 or more.").nullable().optional()),
+}).refine((value) => Object.values(value).some((field) => typeof field !== "undefined"), {
+  message: "Provide at least one lead field to update.",
 });
 
 export type LeadCreateInput = z.infer<typeof leadCreateSchema>;

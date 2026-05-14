@@ -8,6 +8,10 @@ export const leadStatuses = [
 
 export type LeadStatus = (typeof leadStatuses)[number];
 
+export const leadPriorities = ["low", "normal", "high"] as const;
+
+export type LeadPriority = (typeof leadPriorities)[number];
+
 export type Lead = {
   id: string;
   name: string;
@@ -20,6 +24,10 @@ export type Lead = {
   message: string | null;
   status: LeadStatus;
   source: string | null;
+  admin_notes: string | null;
+  priority: LeadPriority;
+  follow_up_date: string | null;
+  estimated_value: number | null;
   createdAt: string;
   updatedAt: string | null;
 };
@@ -36,6 +44,10 @@ export type LeadRow = {
   message: string | null;
   status: LeadStatus;
   source: string | null;
+  admin_notes: string | null;
+  priority: LeadPriority;
+  follow_up_date: string | null;
+  estimated_value: number | null;
   created_at: string;
   updated_at: string | null;
 };
@@ -51,6 +63,10 @@ export type LeadInsert = {
   message?: string | null;
   status?: LeadStatus;
   source: string;
+  admin_notes?: string | null;
+  priority?: LeadPriority;
+  follow_up_date?: string | null;
+  estimated_value?: number | null;
 };
 
 export type LeadUpdate = Partial<
@@ -66,6 +82,10 @@ export type LeadUpdate = Partial<
     | "message"
     | "status"
     | "source"
+    | "admin_notes"
+    | "priority"
+    | "follow_up_date"
+    | "estimated_value"
     | "updated_at"
   >
 >;

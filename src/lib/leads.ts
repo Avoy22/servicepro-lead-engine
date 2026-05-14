@@ -14,6 +14,10 @@ export function toLead(row: LeadRow): Lead {
     message: row.message,
     status: row.status,
     source: row.source,
+    admin_notes: row.admin_notes,
+    priority: row.priority ?? "normal",
+    follow_up_date: row.follow_up_date,
+    estimated_value: row.estimated_value,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
