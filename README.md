@@ -2,7 +2,7 @@
 
 A full-stack-ready lead generation website and mini CRM for service businesses worldwide.
 
-ServicePro Lead Engine is a portfolio project built to show how a modern service business can present its offer, collect structured quote requests, and manage incoming leads from a clean CRM-style dashboard. Version 1 is a frontend/demo implementation: the quote form shows a simulated submission state, and the dashboard uses sample lead data. Version 2 is planned to add Supabase-powered lead capture, storage, authentication, and dashboard functionality.
+ServicePro Lead Engine is a portfolio project built to show how a modern service business can present its offer, collect structured quote requests, and manage incoming leads from a clean CRM-style dashboard. Version 2 adds Supabase-powered lead capture, token-protected admin reads, and dashboard status updates.
 
 ## Live Demo
 
@@ -11,7 +11,7 @@ ServicePro Lead Engine is a portfolio project built to show how a modern service
 - Quote form demo: `/quote`
 - Case study: `/case-study`
 
-> Note: Version 1 is intended as a frontend portfolio/demo build. No real lead data is sent, stored, or managed by a backend in the current version.
+> Note: Version 2 requires Supabase environment variables and the `supabase/schema.sql` table setup before live submissions can be stored.
 
 ## Features
 
@@ -19,9 +19,10 @@ ServicePro Lead Engine is a portfolio project built to show how a modern service
 - Conversion-focused service sections and calls to action
 - Industry sections for multiple service business categories
 - Quote request form with business type, service need, budget, timeline, and message fields
-- Simulated form submission success state
-- Mini CRM dashboard demo with sample leads and pipeline metrics
+- Quote request form wired to `/api/leads`
+- Mini CRM dashboard wired to Supabase leads and pipeline metrics
 - Lead status categories: new, contacted, quoted, won, and lost
+- Token-protected admin API for listing and updating leads
 - Responsive layout for desktop, tablet, and mobile
 - Reusable UI components and section-based architecture
 - Portfolio case study page for client-facing presentation
@@ -45,8 +46,8 @@ ServicePro Lead Engine is a portfolio project built to show how a modern service
 | `/` | Main landing page with hero, services, industries, dashboard preview, process, and CTA sections |
 | `/services` | Service offering overview |
 | `/industries` | Industry use cases for service businesses |
-| `/quote` | Frontend quote request demo form |
-| `/dashboard` | Demo mini CRM dashboard using sample lead data |
+| `/quote` | Quote request form that submits leads to Supabase through `/api/leads` |
+| `/dashboard` | Token-gated mini CRM dashboard using live Supabase lead data |
 | `/case-study` | Portfolio case study explaining the project, goal, stack, and roadmap |
 | `/contact` | Contact page with email, quote form, LinkedIn, and GitHub links |
 
@@ -78,10 +79,16 @@ servicepro-lead-engine/
 |   |   `-- services.ts
 |   |-- lib/
 |   |   |-- icons.tsx
+|   |   |-- supabase/
+|   |   |-- validations/
+|   |   |-- admin-auth.ts
+|   |   |-- leads.ts
 |   |   |-- site.ts
 |   |   `-- utils.ts
 |   `-- types/
 |       `-- index.ts
+|-- supabase/
+|   `-- schema.sql
 |-- components.json
 |-- next.config.ts
 |-- package.json
@@ -102,19 +109,15 @@ Version 1 focuses on the frontend experience and portfolio presentation.
 - Contact page with client-facing calls to action
 - Responsive layout and reusable component structure
 
-## Version 2 Planned Features
+## Version 2 Completed Features
 
-Version 2 will turn the demo into a working full-stack lead management system.
+Version 2 turns the demo into a working full-stack lead management system.
 
 - Supabase database integration for real quote submissions
 - Lead capture from the quote form
-- Authenticated dashboard access
-- CRUD functionality for leads
+- Admin token protected dashboard access
+- API routes for creating, listing, and updating leads
 - Lead status updates from the dashboard
-- Lead notes and follow-up tracking
-- Search, filtering, and sorting for dashboard records
-- Email and/or WhatsApp notifications for new leads
-- Basic analytics for conversion and pipeline performance
 - Environment-based deployment configuration
 
 ## How to Run Locally
@@ -166,12 +169,17 @@ NEXT_PUBLIC_PHONE_NUMBER="+1 000 000 0000"
 NEXT_PUBLIC_BUSINESS_LOCATION="Worldwide"
 NEXT_PUBLIC_DEMO_EMAIL="hello@servicepro-demo.com"
 
-# Planned for Version 2
 NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+ADMIN_ACCESS_TOKEN="choose-a-strong-admin-token"
 ```
 
-The Supabase variables are included as a Version 2 placeholder. The current Version 1 demo does not store leads in Supabase.
+The service role key is used only by server route handlers. Do not expose it to browser code.
+
+## Supabase Setup
+
+Run `supabase/schema.sql` in your Supabase SQL editor. It creates the `leads` table, lead status enum, indexes, an `updated_at` trigger, and enables RLS. The API uses the service role key server-side, so no public table policy is required for the quote form or dashboard.
 
 ## Portfolio Case Study
 
