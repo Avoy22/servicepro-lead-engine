@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { leadCreateSchema } from "@/lib/validations/leads";
 
 const businessTypes = [
   "Home Services",
@@ -35,30 +36,79 @@ const neededServices = [
 
 const budgets = [
   "Under $500",
-  "$500 — $1,500",
-  "$1,500 — $5,000",
+  "$500 - $1,500",
+  "$1,500 - $5,000",
   "$5,000+",
   "Not sure yet",
 ];
 
 const timelines = [
-  "ASAP — within 2 weeks",
-  "2 — 4 weeks",
-  "1 — 2 months",
+  "ASAP - within 2 weeks",
+  "2 - 4 weeks",
+  "1 - 2 months",
   "Flexible",
 ];
 
 export function QuoteForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(0);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError(null);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const payload = {
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      business_type: String(formData.get("business_type") ?? ""),
+      website_url: String(formData.get("website_url") ?? ""),
+      needed_service: String(formData.get("needed_service") ?? ""),
+      budget_range: String(formData.get("budget_range") ?? ""),
+      timeline: String(formData.get("timeline") ?? ""),
+      message: String(formData.get("message") ?? ""),
+      source: "quote_form",
+    };
+
+    const parsed = leadCreateSchema.safeParse(payload);
+
+    if (!parsed.success) {
+      setError(
+        parsed.error.issues[0]?.message ?? "Please check the form and try again.",
+      );
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parsed.data),
+      });
+
+      if (!response.ok) {
+        throw new Error(await readApiError(response));
+      }
+
+      form.reset();
+      setFormKey((current) => current + 1);
       setSubmitted(true);
-    }, 700);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while sending your request.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (submitted) {
@@ -71,14 +121,16 @@ export function QuoteForm() {
           Quote request received.
         </h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-          This is a portfolio demo — no data is sent or stored. In a live
-          deployment, this submission would land directly in the lead
-          dashboard.
+          Thanks for reaching out. Your request has been saved and is ready in
+          the lead dashboard.
         </p>
         <Button
           className="mt-6"
           variant="outline"
-          onClick={() => setSubmitted(false)}
+          onClick={() => {
+            setError(null);
+            setSubmitted(false);
+          }}
         >
           Send another request
         </Button>
@@ -88,6 +140,7 @@ export function QuoteForm() {
 
   return (
     <form
+      key={formKey}
       onSubmit={handleSubmit}
       className="rounded-2xl border border-border/70 bg-card p-6 ring-1 ring-foreground/5 sm:p-8"
     >
@@ -107,7 +160,7 @@ export function QuoteForm() {
         </Field>
 
         <Field id="business" label="Business type" required>
-          <Select name="business" required>
+          <Select name="business_type" required>
             <SelectTrigger
               id="business"
               className="h-9 w-full justify-between"
@@ -115,9 +168,9 @@ export function QuoteForm() {
               <SelectValue placeholder="Select an industry" />
             </SelectTrigger>
             <SelectContent>
-              {businessTypes.map((b) => (
-                <SelectItem key={b} value={b}>
-                  {b}
+              {businessTypes.map((businessType) => (
+                <SelectItem key={businessType} value={businessType}>
+                  {businessType}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -127,21 +180,21 @@ export function QuoteForm() {
         <Field id="website" label="Current website URL">
           <Input
             id="website"
-            name="website"
+            name="website_url"
             type="url"
             placeholder="https://yourbusiness.com"
           />
         </Field>
 
         <Field id="service" label="Needed service" required>
-          <Select name="service" required>
+          <Select name="needed_service" required>
             <SelectTrigger id="service" className="h-9 w-full justify-between">
               <SelectValue placeholder="What do you need?" />
             </SelectTrigger>
             <SelectContent>
-              {neededServices.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
+              {neededServices.map((service) => (
+                <SelectItem key={service} value={service}>
+                  {service}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -149,14 +202,14 @@ export function QuoteForm() {
         </Field>
 
         <Field id="budget" label="Budget range" required>
-          <Select name="budget" required>
+          <Select name="budget_range" required>
             <SelectTrigger id="budget" className="h-9 w-full justify-between">
               <SelectValue placeholder="Pick a range" />
             </SelectTrigger>
             <SelectContent>
-              {budgets.map((b) => (
-                <SelectItem key={b} value={b}>
-                  {b}
+              {budgets.map((budget) => (
+                <SelectItem key={budget} value={budget}>
+                  {budget}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -172,9 +225,9 @@ export function QuoteForm() {
               <SelectValue placeholder="When do you want to launch?" />
             </SelectTrigger>
             <SelectContent>
-              {timelines.map((t) => (
-                <SelectItem key={t} value={t}>
-                  {t}
+              {timelines.map((timeline) => (
+                <SelectItem key={timeline} value={timeline}>
+                  {timeline}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -194,9 +247,15 @@ export function QuoteForm() {
       </div>
 
       <div className="mt-7 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-        <p className="text-xs text-muted-foreground">
-          Portfolio demo — no data is sent or stored.
-        </p>
+        <div className="min-h-5 text-xs">
+          {error ? (
+            <p className="text-rose-600 dark:text-rose-400">{error}</p>
+          ) : (
+            <p className="text-muted-foreground">
+              Your request will be stored securely in Supabase.
+            </p>
+          )}
+        </div>
         <Button type="submit" size="lg" disabled={loading}>
           <Send />
           {loading ? "Sending..." : "Send quote request"}
@@ -226,4 +285,13 @@ function Field({
       {children}
     </div>
   );
+}
+
+async function readApiError(response: Response) {
+  try {
+    const data = (await response.json()) as { error?: string };
+    return data.error ?? "Something went wrong. Please try again.";
+  } catch {
+    return "Something went wrong. Please try again.";
+  }
 }
