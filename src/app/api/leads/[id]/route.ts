@@ -6,6 +6,7 @@ import {
   SupabaseServerConfigError,
 } from "@/lib/supabase/server";
 import { leadStatusUpdateSchema } from "@/lib/validations/leads";
+import type { LeadUpdate } from "@/types";
 
 export const runtime = "nodejs";
 
@@ -45,12 +46,33 @@ export async function PATCH(
 
   try {
     const supabase = createSupabaseServerClient();
+    const updates: LeadUpdate = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (typeof parsed.data.status !== "undefined") {
+      updates.status = parsed.data.status;
+    }
+
+    if (typeof parsed.data.priority !== "undefined") {
+      updates.priority = parsed.data.priority;
+    }
+
+    if (typeof parsed.data.admin_notes !== "undefined") {
+      updates.admin_notes = parsed.data.admin_notes ?? null;
+    }
+
+    if (typeof parsed.data.follow_up_date !== "undefined") {
+      updates.follow_up_date = parsed.data.follow_up_date ?? null;
+    }
+
+    if (typeof parsed.data.estimated_value !== "undefined") {
+      updates.estimated_value = parsed.data.estimated_value ?? null;
+    }
+
     const { data, error } = await supabase
       .from("leads")
-      .update({
-        status: parsed.data.status,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updates)
       .eq("id", id)
       .select("*")
       .single();
