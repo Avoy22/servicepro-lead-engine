@@ -1,155 +1,125 @@
 # ServicePro Lead Engine
 
-A full-stack-ready lead generation website and mini CRM for service businesses worldwide.
+ServicePro Lead Engine is a full-stack lead capture and management system for service businesses. It combines a marketing website, contact/quote form, Supabase-backed lead storage, and a protected admin dashboard for managing inbound inquiries.
 
-ServicePro Lead Engine is a portfolio project built to show how a modern service business can present its offer, collect structured quote requests, and manage incoming leads from a clean CRM-style dashboard. Version 2 adds Supabase-powered lead capture, token-protected admin reads, and dashboard status updates.
+The project is designed as a practical business tool and a portfolio-ready full-stack application. It demonstrates how a service company can move from scattered inquiries to a structured lead workflow.
 
-## Live Demo
+## Overview
 
-- Live site: Coming soon
-- Demo dashboard: `/dashboard`
-- Quote form demo: `/quote`
-- Case study: `/case-study`
+ServicePro Lead Engine helps service-based businesses collect, organize, and manage quote requests from a single web application.
 
-> Note: Version 2 requires Supabase environment variables and the `supabase/schema.sql` table setup before live submissions can be stored.
+Visitors can submit inquiries through a lead capture form. The application validates each submission server-side, stores the lead in Supabase, and makes it available to the business owner through a protected dashboard. From the dashboard, an admin can review leads, update statuses, add notes, search/filter records, and export lead data as CSV.
+
+The project is intended for small service businesses, local operators, agencies, and freelancers who need a reliable lead intake workflow without a large CRM implementation.
+
+## Problem
+
+Service businesses often receive inquiries from many places: website forms, phone calls, email, social media, and referrals. Without a centralized system, those leads can be missed, delayed, duplicated, or forgotten.
+
+This creates real operational problems:
+
+- New inquiries are not always followed up quickly.
+- Lead details are scattered across different tools.
+- Business owners lack a clear view of their sales pipeline.
+- Important context and follow-up notes are easy to lose.
+
+## Solution
+
+ServicePro Lead Engine provides a focused lead capture and management workflow.
+
+The app gives visitors a structured form for submitting service requests, stores each inquiry in Supabase, and gives the business owner an admin dashboard for tracking and managing leads. Instead of treating the website as a static brochure, the application turns it into a working intake system for customer inquiries.
 
 ## Features
 
-- Professional landing page for service businesses
-- Conversion-focused service sections and calls to action
-- Industry sections for multiple service business categories
-- Quote request form with business type, service need, budget, timeline, and message fields
-- Quote request form wired to `/api/leads`
-- Mini CRM dashboard wired to Supabase leads and pipeline metrics
-- Lead status categories: new, contacted, quoted, won, and lost
-- Token-protected admin API for listing and updating leads
-- Responsive layout for desktop, tablet, and mobile
-- Reusable UI components and section-based architecture
-- Portfolio case study page for client-facing presentation
+- Lead capture form
+- Supabase database
+- Server-side validation
+- Protected admin dashboard
+- Lead status tracking
+- Admin notes
+- Search and filtering
+- CSV export
+- Responsive UI
+- Vercel deployment
 
 ## Tech Stack
 
-- Next.js 16
-- React 19
+- Next.js
+- React
 - TypeScript
-- Tailwind CSS v4
-- shadcn/ui-style component structure
-- Radix UI primitives
-- lucide-react icons
-- Supabase client installed for planned Version 2 integration
-- ESLint
+- Tailwind CSS
+- Supabase
+- Zod
+- Vercel
 
-## Pages
+## Architecture
 
-| Route | Description |
-| --- | --- |
-| `/` | Main landing page with hero, services, industries, dashboard preview, process, and CTA sections |
-| `/services` | Service offering overview |
-| `/industries` | Industry use cases for service businesses |
-| `/quote` | Quote request form that submits leads to Supabase through `/api/leads` |
-| `/dashboard` | Token-gated mini CRM dashboard using live Supabase lead data |
-| `/case-study` | Portfolio case study explaining the project, goal, stack, and roadmap |
-| `/contact` | Contact page with email, quote form, LinkedIn, and GitHub links |
-
-## Folder Structure
+The application follows a straightforward full-stack lead management flow:
 
 ```text
-servicepro-lead-engine/
-|-- public/
-|   `-- Static assets
-|-- src/
-|   |-- app/
-|   |   |-- page.tsx
-|   |   |-- services/
-|   |   |-- industries/
-|   |   |-- quote/
-|   |   |-- dashboard/
-|   |   |-- case-study/
-|   |   |-- contact/
-|   |   |-- layout.tsx
-|   |   `-- globals.css
-|   |-- components/
-|   |   |-- forms/
-|   |   |-- layout/
-|   |   |-- sections/
-|   |   `-- ui/
-|   |-- data/
-|   |   |-- industries.ts
-|   |   |-- leads.ts
-|   |   `-- services.ts
-|   |-- lib/
-|   |   |-- icons.tsx
-|   |   |-- supabase/
-|   |   |-- validations/
-|   |   |-- admin-auth.ts
-|   |   |-- leads.ts
-|   |   |-- site.ts
-|   |   `-- utils.ts
-|   `-- types/
-|       `-- index.ts
-|-- supabase/
-|   `-- schema.sql
-|-- components.json
-|-- next.config.ts
-|-- package.json
-`-- tsconfig.json
+Visitor submits form
+        |
+        v
+API route validates input with server-side validation
+        |
+        v
+Supabase stores the lead record
+        |
+        v
+Protected admin dashboard fetches lead data
+        |
+        v
+Admin updates lead status and notes
+        |
+        v
+CSV export downloads lead data
 ```
 
-## Version 1 Completed Features
+At a high level:
 
-Version 1 focuses on the frontend experience and portfolio presentation.
+- The public website presents the service business and directs visitors to the quote/contact form.
+- The lead form submits data to a server-side API route.
+- The API route validates input before writing to Supabase.
+- Protected admin endpoints provide access to lead records for the dashboard.
+- The dashboard supports lead review, workflow updates, notes, search, filtering, and CSV export.
 
-- Landing page with a polished SaaS-style design
-- Services page and reusable service data
-- Industries page and reusable industry data
-- Quote request form UI with simulated submission feedback
-- Demo dashboard with static sample leads
-- Pipeline summary cards and status distribution UI
-- Case study page for GitHub, LinkedIn, Upwork, and Fiverr presentation
-- Contact page with client-facing calls to action
-- Responsive layout and reusable component structure
+## Screenshots
 
-## Version 2 Completed Features
+![Homepage](public/screenshots/servicepro-home-full.png)
 
-Version 2 turns the demo into a working full-stack lead management system.
+![Dashboard](public/screenshots/servicepro-dashboard.png)
 
-- Supabase database integration for real quote submissions
-- Lead capture from the quote form
-- Admin token protected dashboard access
-- API routes for creating, listing, and updating leads
-- Lead status updates from the dashboard
-- Environment-based deployment configuration
+## Environment Variables
 
-## How to Run Locally
+Create a `.env.local` file in the project root and provide the required environment variables:
 
-Clone the repository and install dependencies:
+```env
+NEXT_PUBLIC_SITE_NAME=
+NEXT_PUBLIC_WHATSAPP_NUMBER=
+NEXT_PUBLIC_PHONE_NUMBER=
+NEXT_PUBLIC_BUSINESS_LOCATION=
+NEXT_PUBLIC_DEMO_EMAIL=
+
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+ADMIN_ACCESS_TOKEN=
+```
+
+Do not commit `.env.local` or expose server-only secrets in client-side code.
+
+## Local Setup
+
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-Start the development server:
+Start the local development server:
 
 ```bash
 npm run dev
-```
-
-Open the app in your browser:
-
-```text
-http://localhost:3000
-```
-
-Build for production:
-
-```bash
-npm run build
-```
-
-Run the production build:
-
-```bash
-npm start
 ```
 
 Run linting:
@@ -158,56 +128,48 @@ Run linting:
 npm run lint
 ```
 
-## Environment Variables Example
+Build for production:
 
-Create a `.env.local` file in the project root:
-
-```env
-NEXT_PUBLIC_SITE_NAME="ServicePro Lead Engine"
-NEXT_PUBLIC_WHATSAPP_NUMBER="10000000000"
-NEXT_PUBLIC_PHONE_NUMBER="+1 000 000 0000"
-NEXT_PUBLIC_BUSINESS_LOCATION="Worldwide"
-NEXT_PUBLIC_DEMO_EMAIL="hello@servicepro-demo.com"
-
-NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
-SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
-ADMIN_ACCESS_TOKEN="choose-a-strong-admin-token"
+```bash
+npm run build
 ```
 
-The service role key is used only by server route handlers. Do not expose it to browser code.
-
-## Supabase Setup
-
-Run `supabase/schema.sql` in your Supabase SQL editor. It creates the `leads` table, lead status enum, indexes, an `updated_at` trigger, and enables RLS. The API uses the service role key server-side, so no public table policy is required for the quote form or dashboard.
-
-## Portfolio Case Study
-
-ServicePro Lead Engine was created as a client-facing portfolio project for service businesses that need a stronger web presence and a better way to handle inbound inquiries.
-
-The project demonstrates:
-
-- How a service business website can be structured around lead generation
-- How quote requests can be collected through a clear, guided form experience
-- How a lightweight CRM dashboard can help business owners understand their pipeline
-- How reusable data and components can support multiple service industries
-- How a frontend-first demo can be extended into a production-ready full-stack system
-
-This makes the project suitable for showcasing on GitHub, LinkedIn, Upwork, and Fiverr as an example of practical product design, frontend development, and full-stack planning.
-
-## Screenshots
-
-Screenshots can be added here after deployment or final UI review.
+The local development server usually runs at:
 
 ```text
-/screenshots/home.png
-/screenshots/quote.png
-/screenshots/dashboard.png
-/screenshots/case-study.png
+http://localhost:3000
 ```
+
+## Deployment
+
+This project is intended to deploy on Vercel.
+
+To deploy:
+
+1. Connect the repository to Vercel.
+2. Add the required environment variables in the Vercel project settings.
+3. Configure the Supabase project and database schema.
+4. Deploy the application.
+
+The Supabase service role key must only be used by server-side routes and should be stored as a protected environment variable in Vercel.
+
+## Security Notes
+
+- Service role key is server-side only.
+- Admin routes are protected.
+- `.env.local` is not committed.
+- Input validation is used before storing lead data.
+
+## Future Improvements
+
+- Email notifications
+- Authentication provider
+- Lead analytics
+- Export filters
+- Multi-user support
 
 ## Author
 
 **Avoy Das**
 
-Frontend and full-stack web developer building practical lead generation systems, business websites, and portfolio-ready SaaS demos for clients worldwide.
+Frontend and full-stack web developer building practical lead generation systems, business websites, and portfolio-ready SaaS demos.
